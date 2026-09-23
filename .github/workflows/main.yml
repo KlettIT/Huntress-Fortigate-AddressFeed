@@ -55,7 +55,10 @@ jobs:
           if [ -f feed.txt ]; then
             total=$(cat feed.txt feed.new | sort -u | wc -l)
             if [ "$total" -le "$max" ]; then
-              cat feed.txt feed.new | sort -u > feed.txt
+              # never write to feed.txt while reading it; use a temp file
+              cat feed.txt feed.new > feed.merged
+              sort -u feed.merged > feed.txt
+              rm -f feed.merged
               echo "Merged, feed now has $(wc -l < feed.txt) entries"
             else
               echo "Union exceeds $max, reset to fresh resolutions"
